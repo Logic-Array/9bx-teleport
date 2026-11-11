@@ -1015,6 +1015,14 @@ def main():
         print(feats)
         return
 
+    # Orbit branding: bake the self-hosted server, public key and app name into
+    # the compile-time config (libs/hbb_common/src/config.rs, a submodule) before
+    # any build. Idempotent; aborts the build if the config cannot be branded.
+    bake = subprocess.run([sys.executable, os.path.join("orbit", "patch_hbb_config.py")])
+    if bake.returncode != 0:
+        sys.stderr.write("Error: failed to bake Orbit config. Exiting.\n")
+        sys.exit(-1)
+
     if os.path.exists(exe_path):
         os.unlink(exe_path)
     if os.path.isfile('/usr/bin/pacman'):
